@@ -4,6 +4,7 @@ import Navbar from '@/components/Navbar/Navbar';
 import AuthModal from '@/components/Modals/AuthModal';
 import { useRecoilValue } from 'recoil';
 import { authModalState } from '@/atoms/authModalAtom';
+import Image from 'next/image';
 import { auth } from '@/firebase/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useRouter } from 'next/navigation';
@@ -28,7 +29,7 @@ const page:React.FC<pageProps> = () => {
             <div className='max-w-7xl mx-auto'>
                 <Navbar />
                 <div className='flex itmes-center justify-center h-[calc(100vh-5rem)] pointer-events-none select-none'>
-                    <img src = '/hero.png' alt = 'Hero Image'/>
+                    <Image src = '/hero.png' alt = 'Hero Image' width={700} height={700} />
                 </div>
                 {authModal.isOpen && <AuthModal />}
             </div>
