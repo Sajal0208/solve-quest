@@ -4,6 +4,8 @@ import { authModalState } from '@/atoms/authModalAtom';
 import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { auth } from '@/firebase/firebase';
 import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 
 type SignUpProps = {
     
@@ -46,11 +48,29 @@ const SignUp:React.FC<SignUpProps> = () => {
         e.preventDefault();
         if(!userInput.email || !userInput.displayName || !userInput.password) return alert('Please fill all the fields')
         try {
+            toast.loading('Creating Your Account...', {position: 'top-center', toastId: 'loadingToast'})
             const newUser = await createUserWithEmailAndPassword(userInput.email, userInput.password)
             if(!newUser) return;
+            const userData = {
+                uid: newUser.user.uid,
+                email: newUser.user.email,
+                name: userInput.displayName,
+                dislikedProblems: [],
+                likedProblems: [],
+                solvedProblems: [],
+                starredProblems: [],
+            }
+            const res = await axios.post(`${process.env.NEXT_PUBLIC_BASEURL}/user/createUser`, userData)
+            if(res.status === 201) {
+                toast.success('Account Created Successfully', {position: 'top-center', toastId: 'successToast'})
+            } else {
+                throw new Error('Something went wrong')
+            }
             router.push('/')
         } catch (error: any) {
-            console.log(error.message)
+            toast.error(error.message, {position: 'top-center', toastId: 'loadingToast'})
+        } finally { 
+            toast.dismiss('loadingToast')
         }
     }
     

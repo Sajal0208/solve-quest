@@ -20,7 +20,7 @@ export type Problem = {
 };
 
 export type DBProblem = {
-	id: string;
+	_id: string;
 	title: string;
 	category: string;
 	difficulty: string;
@@ -29,4 +29,5 @@ export type DBProblem = {
 	order: number;
 	videoId?: string;
 	link?: string;
+	id: string;
 };
