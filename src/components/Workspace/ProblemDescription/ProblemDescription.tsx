@@ -2,14 +2,13 @@ import { auth, firestore } from "@/firebase/firebase";
 import { DBProblem, Problem } from "@/utils/types/problem";
 import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { AiFillLike, AiFillDislike, AiOutlineLike } from "react-icons/ai";
+import { AiFillLike, AiFillDislike, AiOutlineLike, AiOutlineLoading3Quarters, AiFillStar } from "react-icons/ai";
 import { BsCheck2Circle } from "react-icons/bs";
 import { TiStarOutline } from "react-icons/ti";
 import RectangleSkeleton from "@/components/Skeletons/RectangleSkeleton";
 import CircleSkeleton from "@/components/Skeletons/CircleSkeleton";
 import axios from "axios";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { PAGE_SEGMENT_KEY } from "next/dist/shared/lib/constants";
 import { toast } from "react-toastify";
 
 type ProblemDescriptionProps = {
@@ -18,29 +17,81 @@ type ProblemDescriptionProps = {
 
 const ProblemDescription: React.FC<ProblemDescriptionProps> = ({ problem }) => {
 	const [user] = useAuthState(auth);
-	const { currentProblem, loading, problemDifficultyClass } = useGetCurrentProblem(problem.id)
+	const { currentProblem, loading, problemDifficultyClass, setCurrentProblem } = useGetCurrentProblem(problem.id)
 	const {
 		liked,
 		disliked,
 		starred,
-		solved 
+		solved,
+		setData
 	} = useGetUserDataOnProblem(problem.id)
 	const [updating, setUpdating] = useState(false)
 
 	const handleLike = async () => {
-		if(!user) {
-			toast.error('Please login to like the problem', {position: 'top-left'})
+		if (!user) {
+			return toast.error('Please login to like the problem', { position: 'top-left' })
 		}
-		
+		if (updating) return
+		setUpdating(true)
 		const body = {
 			uid: user?.uid,
-			problemId: problem.id
 		}
-
-		
-
-
+		console.log(problem)
+		const url = `${process.env.NEXT_PUBLIC_BASEURL}/problem/handleLike/${problem.id}`
+		const response = await axios.put(url, body)
+		setCurrentProblem(response.data.problem)
+		setData({
+			liked: response.data.user.likedProblems.includes(problem.id), // will return true or false
+			disliked: response.data.user.dislikedProblems.includes(problem.id),
+			starred: response.data.user.starredProblems.includes(problem.id),
+			solved: response.data.user.solvedProblems.includes(problem.id)
+		})
+		setUpdating(false)
 	}
+
+
+	const handleDislike = async () => {
+		if (!user) {
+			return toast.error('Please login to dislike the problem', { position: 'top-left' })
+		}
+		if (updating) return
+		setUpdating(true)
+		const body = {
+			uid: user?.uid,
+		}
+		const url = `${process.env.NEXT_PUBLIC_BASEURL}/problem/handleDislike/${problem.id}`
+		const response = await axios.put(url, body)
+		setCurrentProblem(response.data.problem)
+		setData({
+			liked: response.data.user.likedProblems.includes(problem.id), // will return true or false
+			disliked: response.data.user.dislikedProblems.includes(problem.id),
+			starred: response.data.user.starredProblems.includes(problem.id),
+			solved: response.data.user.solvedProblems.includes(problem.id)
+		})
+		setUpdating(false)
+	}
+
+	const handleStar = async () => {
+		if (!user) {
+			return toast.error('Please login to star the problem', { position: 'top-left' })
+		}
+		if (updating) return
+		setUpdating(true)
+		const body = {
+			uid: user?.uid,
+		}
+		const url = `${process.env.NEXT_PUBLIC_BASEURL}/problem/handleStar/${problem.id}`
+		const response = await axios.put(url, body)
+		setCurrentProblem(response.data.problem)
+		setData({
+			liked: response.data.user.likedProblems.includes(problem.id), // will return true or false
+			disliked: response.data.user.dislikedProblems.includes(problem.id),
+			starred: response.data.user.starredProblems.includes(problem.id),
+			solved: response.data.user.solvedProblems.includes(problem.id)
+		})
+		setUpdating(false)
+	}
+
 
 	return (
 		<div className='bg-dark-layer-1'>
@@ -66,19 +117,27 @@ const ProblemDescription: React.FC<ProblemDescriptionProps> = ({ problem }) => {
 									>
 										{currentProblem.difficulty}
 									</div>
-									<div className='rounded p-[3px] ml-4 text-lg transition-colors duration-200 text-green-s text-dark-green-s'>
+									{solved && <div className='rounded p-[3px] ml-4 text-lg transition-colors duration-200 text-green-s text-dark-green-s'>
 										<BsCheck2Circle />
-									</div>
-									<div onClick = {handleLike} className='flex items-center cursor-pointer hover:bg-dark-fill-3 space-x-1 rounded p-[3px]  ml-4 text-lg transition-colors duration-200 text-dark-gray-6'>
-										{liked ? <AiFillLike className="text-dark-blue-s" /> : <AiFillLike />}
+									</div>}
+									<div onClick={handleLike} className='flex items-center cursor-pointer hover:bg-dark-fill-3 space-x-1 rounded p-[3px]  ml-4 text-lg transition-colors duration-200 text-dark-gray-6'>
+										{liked && !updating && <AiFillLike className="text-dark-blue-s" />}
+										{!liked && !updating && <AiFillLike />}
+										{updating && <AiOutlineLoading3Quarters className="animate-spin" />}
+
 										<span className='text-xs'>{currentProblem.likes}</span>
 									</div>
-									<div className='flex items-center cursor-pointer hover:bg-dark-fill-3 space-x-1 rounded p-[3px]  ml-4 text-lg transition-colors duration-200 text-green-s text-dark-gray-6'>
-										<AiFillDislike />
+									<div onClick={handleDislike} className='flex items-center cursor-pointer hover:bg-dark-fill-3 space-x-1 rounded p-[3px]  ml-4 text-lg transition-colors duration-200 text-green-s text-dark-gray-6'>
+										{disliked && !updating && <AiFillDislike className="text-dark-blue-s" />}
+										{!disliked && !updating && <AiFillDislike />}
+										{updating && <AiOutlineLoading3Quarters className="animate-spin" />}
+
 										<span className='text-xs'>{currentProblem.dislikes}</span>
 									</div>
-									<div className='cursor-pointer hover:bg-dark-fill-3  rounded p-[3px]  ml-4 text-xl transition-colors duration-200 text-green-s text-dark-gray-6 '>
-										<TiStarOutline />
+									<div onClick={handleStar} className='cursor-pointer hover:bg-dark-fill-3  rounded p-[3px]  ml-4 text-xl transition-colors duration-200 text-green-s text-dark-gray-6 '>
+										{starred && !updating && <AiFillStar className="text-dark-yellow" />}
+										{!starred && !updating && <TiStarOutline />}
+										{updating && <AiOutlineLoading3Quarters className="animate-spin" />}
 									</div>
 								</div>
 							)
@@ -164,26 +223,22 @@ function useGetCurrentProblem(problemId: string) {
 			setLoading(true)
 			const url: string = `${process.env.NEXT_PUBLIC_BASEURL}/problem/getProblem/${problemId}`
 			const response = await axios.get(url)
-			const docRef = doc(firestore, "problems", problemId)
-			const docSnap = await getDoc(docRef)
-			if (docSnap.exists()) {
-				const problem = docSnap.data() as DBProblem
-				setCurrentProblem({
-					...problem,
-					id: docSnap.id,
-				} as DBProblem)
-				setProblemDifficultyClass(
-					problem.difficulty === "Easy" ? "bg-olive text-olive" :
-						problem.difficulty === "Medium" ? "bg-dark-yellow text-dark-yellow" :
-							"bg-dark-pink text-dark-pink"
-				)
-			}
+			console.log("🚀 ~ file: ProblemDescription.tsx:173 ~ getCurrentProblem ~ response:", response.data)
+			const problem = response.data._doc
+			setCurrentProblem({
+				...problem,
+			})
+			setProblemDifficultyClass(
+				problem.difficulty === "Easy" ? "bg-olive text-olive" :
+					problem.difficulty === "Medium" ? "bg-dark-yellow text-dark-yellow" :
+						"bg-dark-pink text-dark-pink"
+			)
 			setLoading(false)
 		}
 		getCurrentProblem()
 	}, [problemId])
 
-	return { currentProblem, loading, problemDifficultyClass }
+	return { currentProblem, loading, problemDifficultyClass, setCurrentProblem }
 }
 
 
@@ -205,10 +260,12 @@ function useGetUserDataOnProblem(problemId: string) {
 				},
 			}
 			const userData = await axios.get(url, config)
+			console.log("🚀 ~ file: ProblemDescription.tsx:210 ~ getUsersData ~ userData:", userData)
 			if (!userData) {
 				throw new Error("User not found")
 			}
 			const { likedProblems, dislikedProblems, starredProblems, solvedProblems } = userData.data._doc
+			console.log("🚀 ~ file: ProblemDescription.tsx:268 ~ getUsersData ~ userData.data._doc:", userData.data._doc)
 			setData({
 				liked: likedProblems.includes(problemId), // will return true or false
 				disliked: dislikedProblems.includes(problemId),
