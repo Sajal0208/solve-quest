@@ -7,6 +7,7 @@ import { useState } from 'react'
 import { problems } from '@/mockProblems/problems'
 import { firestore } from '@/firebase/firebase'
 import axios from 'axios'
+import useHasMounted from '@/hooks/useHasMounted'
 
 export default function Home() {
   // const [input, setInput] = useState({
@@ -48,6 +49,10 @@ export default function Home() {
   // }
 
   const [loading, setLoading] = useState(true);
+  const hasMounted = useHasMounted(); 
+
+  if(!hasMounted) return null
+
   return (
     <div className="bg-dark-layer-2 min-h-screen">
       <Topbar />

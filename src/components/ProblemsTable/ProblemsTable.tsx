@@ -6,9 +6,10 @@ import { IoClose } from 'react-icons/io5';
 import YouTube from 'react-youtube';
 import Link from 'next/link';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
-import { firestore } from '@/firebase/firebase';
+import { auth, firestore } from '@/firebase/firebase';
 import { DBProblem } from '@/utils/types/problem';
 import axios from 'axios';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 type ProblemsTableProps = {
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -21,6 +22,7 @@ const ProblemsTable: React.FC<ProblemsTableProps> = ({ setLoading }) => {
     });
 
     const problems = useGetProblems(setLoading);
+    const solvedProblems = useGetSolvedProblems();
 
     const closeModal = () => {
         setYoutubePlayer({
@@ -45,7 +47,7 @@ const ProblemsTable: React.FC<ProblemsTableProps> = ({ setLoading }) => {
                     return (
                         <tr className={`${idx % 2 == 1 ? "bg-dark-layer-1" : ""}`} key={problem.id}>
                             <th className="px-2 py-4 font-medium whitespace-nowrap text-dark-green-s">
-                                <BsCheckCircle fontSize={'18'} width='18' />
+                                {solvedProblems.includes(problem.id) && <BsCheckCircle fontSize={'18'} width='18' />}
                             </th>
                             <td className='px-6 py-4'>
                                 <Link className='hover:text-blue-600 cursor-pointer' href={`/problems/${problem.id}`}>
@@ -104,11 +106,34 @@ function useGetProblems(setLoading: React.Dispatch<React.SetStateAction<boolean>
                 } as DBProblem);
             });
             // tempArray.push(...response.data.problems);
-            tempArray.sort((a, b) => a.order - b.order);    
+            tempArray.sort((a, b) => a.order - b.order);
             setProblems(tempArray);
             setLoading(false);
         }
         getProblems();
     }, [setLoading]);
     return problems;
+}
+
+function useGetSolvedProblems() {
+    const [solvedProblems, setSolvedProblems] = useState<string[]>([]);
+    const [user] = useAuthState(auth);
+
+    useEffect(() => {
+        const getSolvedProblems = async () => {
+            const url = `${process.env.NEXT_PUBLIC_BASEURL}/user/getUser/${user?.uid}`
+            const response = await axios.get(url);
+            const solvedProblems = response.data._doc.solvedProblems;
+            setSolvedProblems(solvedProblems);
+        }
+        if (user) {
+            getSolvedProblems();
+        }
+        if(!user) {
+            setSolvedProblems([]);
+        }
+
+    }, [user])
+
+    return solvedProblems;
 }
