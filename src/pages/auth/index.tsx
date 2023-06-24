@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar/Navbar';
 import AuthModal from '@/components/Modals/AuthModal';
 import { useRecoilValue } from 'recoil';
@@ -9,15 +9,15 @@ import { auth } from '@/firebase/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useRouter } from 'next/navigation';
 
-type pageProps = {
+type PageProps = {
     
 };
 
-const page:React.FC<pageProps> = () => {
+const Page:React.FC<PageProps> = () => {
     const router = useRouter();
     const [user, loading, error] = useAuthState(auth);
     const authModal = useRecoilValue(authModalState)
-    const [pageLoading, setPageLoading] = React.useState(true)
+    const [pageLoading, setPageLoading] = useState(true)
     useEffect(() => {
         if(user) router.push('/')
         if(!loading && !user) setPageLoading(false)
@@ -36,4 +36,4 @@ const page:React.FC<pageProps> = () => {
         </div>
     )
 }
-export default page;
+export default Page;
