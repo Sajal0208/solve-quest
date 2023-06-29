@@ -10,43 +10,6 @@ import axios from 'axios'
 import useHasMounted from '@/hooks/useHasMounted'
 
 export default function Home() {
-  // const [input, setInput] = useState({
-  //   id: '',
-  //   title: '',
-  //   difficulty: '',
-  //   category: '',
-  //   videoId: '',
-  //   link: '',
-  //   order: 0,
-  //   likes: 0,
-  //   dislikes: 0,
-  // })
-
-  // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setInput((prev) => {
-  //     return {
-  //       ...prev,
-  //       [e.target.name]: e.target.value,
-  //     }
-  //   })
-  // }
-
-  // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault()
-  //   const test = problems.map(async (problem, index) => {
-  //     if(index === 7) {
-  //       const newProblem = {
-  //         ...problem,
-  //         order: Number(problem.order),
-  //         title: `${index + 1}. ${problem.title}`,
-  //       }
-  //       const status = await axios.post(`${process.env.NEXT_PUBLIC_BASEURL}/problem/addProblem`, newProblem)
-  //       return status
-  //     }
-  //     return null
-  //   })
-  //   console.log(test)
-  // }
 
   const [loading, setLoading] = useState(true);
   const hasMounted = useHasMounted(); 
@@ -96,16 +59,7 @@ export default function Home() {
           <ProblemsTable setLoading={setLoading} />
         </table>
       </div>
-      {/* <form onSubmit={handleSubmit}>
-        <input onChange={handleInputChange} type='text' placeholder='problem id' name='id' />
-        <input onChange={handleInputChange} type='text' placeholder='problem title' name='title' />
-        <input onChange={handleInputChange} type='text' placeholder='problem difficulty' name='difficulty' />
-        <input onChange={handleInputChange} type='text' placeholder='problem category' name='category' />
-        <input onChange={handleInputChange} type='text' placeholder='problem category' name='order' />
-        <input onChange={handleInputChange} type='text' placeholder='problem videoId' name='videoId' />
-        <input onChange={handleInputChange} type='text' placeholder='problem link' name='link' />
-        <button className='bg-white'>Start</button>
-      </form> */}
+      
     </div>
   )
 }
@@ -121,3 +75,53 @@ const LoadingSkeleton = () => {
     </div>
   );
 };
+
+
+  // const [input, setInput] = useState({
+  //   id: '',
+  //   title: '',
+  //   difficulty: '',
+  //   category: '',
+  //   videoId: '',
+  //   link: '',
+  //   order: 0,
+  //   likes: 0,
+  //   dislikes: 0,
+  // })
+
+  // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setInput((prev) => {
+  //     return {
+  //       ...prev,
+  //       [e.target.name]: e.target.value,
+  //     }
+  //   })
+  // }
+
+  // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault()
+  //   const test = problems.map(async (problem, index) => {
+  //     if(index === 7) {
+  //       const newProblem = {
+  //         ...problem,
+  //         order: Number(problem.order),
+  //         title: `${index + 1}. ${problem.title}`,
+  //       }
+  //       const status = await axios.post(`${process.env.NEXT_PUBLIC_BASEURL}/problem/addProblem`, newProblem)
+  //       return status
+  //     }
+  //     return null
+  //   })
+  //   console.log(test)
+  // }
+
+  {/* <form onSubmit={handleSubmit}>
+        <input onChange={handleInputChange} type='text' placeholder='problem id' name='id' />
+        <input onChange={handleInputChange} type='text' placeholder='problem title' name='title' />
+        <input onChange={handleInputChange} type='text' placeholder='problem difficulty' name='difficulty' />
+        <input onChange={handleInputChange} type='text' placeholder='problem category' name='category' />
+        <input onChange={handleInputChange} type='text' placeholder='problem category' name='order' />
+        <input onChange={handleInputChange} type='text' placeholder='problem videoId' name='videoId' />
+        <input onChange={handleInputChange} type='text' placeholder='problem link' name='link' />
+        <button className='bg-white'>Start</button>
+      </form> */}
