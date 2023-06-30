@@ -1,12 +1,6 @@
-import Image from 'next/image'
-import Navbar from '@/components/Navbar/Navbar'
 import Topbar from '@/components/Topbar/Topbar'
-import { doc, setDoc } from 'firebase/firestore'
 import ProblemsTable from '@/components/ProblemsTable/ProblemsTable'
 import { useState } from 'react'
-import { problems } from '@/mockProblems/problems'
-import { firestore } from '@/firebase/firebase'
-import axios from 'axios'
 import useHasMounted from '@/hooks/useHasMounted'
 
 export default function Home() {
